@@ -1,16 +1,17 @@
-import Evolution
 import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+import scipy
+import Evolution
 
 states = np.zeros(4).reshape(1,4)
-struc = np.array([[0,1,0,0,0,0],[1,0,1,1,0,0],[0,1,0,1,0,0],[0,1,1,0,1,1],[0,0,0,1,0,1],[0,0,0,1,1,0]])
-sample = np.array([1.4, 1.6])
+struc = [np.array([1]),np.array([0,2,3]),np.array([1,3]),np.array([1,2,4,5]),np.array([3,5]),np.array([3,4])]
+sample = np.array([0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6])
 for i in sample:
     states = np.zeros(4).reshape(1,4)
-    for j in range(50):
+    for j in range(200):
         population = np.random.randint(0,4,6)
-        star = Evolution(population, struc, 0.01, np.array([11,-1,12,0,i,0.8]), 0.01)
-        Evolution.DB_evolve(star,1000000)
-        print(np.average(star.trace, axis=0))
-        states = np.append(states, np.average(star.trace, axis=0).reshape(1,4), axis=0)
-    with open('threshold=18'+'e1='+str(i)+'.txt', 'ab') as f:
-        np.savetxt(f, np.delete(states, 0, axis=0))
+        star = Evolution.Evolution(population, struc, 0.01, np.array([11,-1,12,0,i,0.8]), 0.01)
+        star.DB_evolve(1000000)
+        with open('threshold=18'+'e1='+str(i)+'.txt', 'ab') as f:
+            np.savetxt(f, np.average(star.trace, axis=0).reshape(1,4))

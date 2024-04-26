@@ -15,18 +15,28 @@ class Evolution:
         self.population = population
         self.population_structure = struc
         self.mutation_rate = mutation
-        self.payoff_matrix = np.array([[R, R, S, S], [R-epsilon_1, R-epsilon_1, S-epsilon_1, S-epsilon_1], [T-epsilon_2, T-epsilon_2, P-epsilon_2, P-epsilon_2], [T, T, P, P]])
+        self.payoff_matrix = np.array([[R, R, R, S, S, S], [R-epsilon_1/2, R-epsilon_1/2, R-epsilon_1/2, S-epsilon_1/2, S-epsilon_1/2, S-epsilon_1/2], [R-epsilon_1, R-epsilon_1, R-epsilon_1, S-epsilon_1, S-epsilon_1, S-epsilon_1], [T-epsilon_2, T-epsilon_2, T-epsilon_2, P-epsilon_2, P-epsilon_2, P-epsilon_2], [T-epsilon_2/2, T-epsilon_2/2, T-epsilon_2/2, P-epsilon_2/2, P-epsilon_2/2, P-epsilon_2/2], [T, T, T, P, P, P]])
         self.selection_intensity = intensity
         self.fitness = np.zeros(self.pop_size)
-        self.evolution_state = np.array([np.count_nonzero(self.population==0), np.count_nonzero(self.population==1), np.count_nonzero(self.population==2), np.count_nonzero(self.population==3)]).reshape(1,4)/self.pop_size
-        self.trace = np.empty(0).reshape(0,4)
-        self.average_state = np.zeros(shape=(1,4)).reshape(1,4)
+        self.evolution_state = np.array([np.count_nonzero(self.population==i) for i in range(6)]).reshape(1,6)/self.pop_size
+        self.trace = np.empty(0).reshape(0,6)
+        self.average_state = np.zeros(shape=(1,6)).reshape(1,6)
 
     def cal_fitness(self):
         payoff = np.zeros(self.pop_size)
         for i in range(self.pop_size):
             payoff[i] = self.payoff_matrix[self.population[i]][self.population[self.population_structure[i]]].sum()
         self.fitness = 1-self.selection_intensity*np.ones(self.pop_size)+self.selection_intensity*payoff
+        
+    def revise_fitness(self, replaced):
+        self.fitness[replaced] = 0
+        self.fitness[replaced] = self.payoff_matrix[self.population[replaced]][self.population[self.population_structure[replaced]]].sum()
+        self.fitness[replaced] = (1-self.selection_intensity*np.ones(self.pop_size)+self.selection_intensity*self.fitness)[replaced]
+        for neighbers in self.population_structure[replaced]:
+            self.fitness[neighbers] = 0
+            self.fitness[neighbers] = self.payoff_matrix[self.population[neighbers]][self.population[self.population_structure[neighbers]]].sum()
+            self.fitness[neighbers] = (1-self.selection_intensity*np.ones(self.pop_size)+self.selection_intensity*self.fitness)[neighbers]
+
 
     def death(self):
         death_individual = np.random.randint(self.pop_size)
@@ -45,16 +55,17 @@ class Evolution:
     def mutation(self, death_individual):
         rand = np.random.rand()
         if rand < self.mutation_rate:
-            rand_mutation = np.random.randint(4)
+            rand_mutation = np.random.randint(6)
             self.population[death_individual] = rand_mutation
         else:
             self.birth(death_individual)
                 
     def DB_evolve(self, step: int):
         self.trace = self.evolution_state
+        self.cal_fitness()
         for i in range(step):
             death_individual = self.death()
             self.mutation(death_individual)
-            self.cal_fitness()
-            self.evolution_state = np.array([np.count_nonzero(self.population==i) for i in range(4)]).reshape(1,4)/self.pop_size
+            self.revise_fitness(death_individual)
+            self.evolution_state = np.array([np.count_nonzero(self.population==i) for i in range(6)]).reshape(1,6)/self.pop_size
             self.trace = np.append(self.trace, self.evolution_state, axis=0)
