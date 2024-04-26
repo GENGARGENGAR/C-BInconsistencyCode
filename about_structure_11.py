@@ -13,5 +13,5 @@ for i in sample:
         population = np.random.randint(0,4,6)
         star = Evolution.Evolution(population, struc, 0.01, np.array([11,-1,12,0,i,0.8]), 0.01)
         star.DB_evolve(1000000)
-        with open('data/threshold=18'+'e1='+str(i)+'.txt', 'ab') as f:
+        with open('threshold=18'+'e1='+str(i)+'.txt', 'ab') as f:
             np.savetxt(f, np.average(star.trace, axis=0).reshape(1,4))

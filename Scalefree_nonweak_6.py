@@ -16,5 +16,5 @@ for i in sample:
         population = np.random.randint(0,4,400)
         DB_ragular = Evolution.Evolution(population, nx.adjacency_matrix(struc).indices.reshape(400,3), 0.1, np.array([3,-1,4,0,0.2,0.6]), i)
         DB_ragular.DB_evolve(200000)
-        with open('scalefree_nonweak_6_w='+str(i)'.txt', 'ab') as f:
+        with open('s_scalefree_w='+str(i)'.txt', 'ab') as f:
             np.savetxt(f, np.average(DB_ragular.trace, axis=0).reshape(1,4))

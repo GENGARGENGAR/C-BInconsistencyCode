@@ -25,5 +25,5 @@ for i in sample:
     for j in range(100):
         DB_karate = Evolution.Evolution(population, struc, 0.1, np.array([6,-1,7,0,0,0]), i)
         DB_karate.DB_evolve(200000)
-        with open('karate_0_w'+str(i)+'.txt', 'ab') as f:
+        with open('n_karate_w'+str(i)+'.txt', 'ab') as f:
             np.savetxt(f, np.average(DB_karate.trace, axis=0).reshape(1,4))
