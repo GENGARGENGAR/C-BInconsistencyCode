@@ -16,7 +16,7 @@ for i in sample:
             end_index = nx.adjacency_matrix(regular_network).indptr[row_index + 1]
             non_zero_indices = nx.adjacency_matrix(regular_network).indices[start_index:end_index]
             struc.append(non_zero_indices)
-        DB_regular = Evolution4.Evolution(population, struc, 0.1, np.array([3,-1,4,0,i,0.8]), 0.01)
+        DB_regular = Evolution4.Evolution(population, struc, 0.1, np.array([3,-1,4,0,i,0.8]), 0.002)
         DB_regular.DB_evolve(1000000)
         with open('data/opinion=4_'+'e1='+str(i)+'.txt', 'ab') as f:
             np.savetxt(f, np.average(DB_regular.trace, axis=0).reshape(1,8))
